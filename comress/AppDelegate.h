@@ -25,7 +25,7 @@
 
 #import "Reachability.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>
 {
     DDFileLogger *fileLogger;
     Database *myDatabase;
@@ -37,6 +37,8 @@
 @property (nonatomic) Reachability *hostReachability;
 @property (nonatomic) Reachability *internetReachability;
 @property (nonatomic) Reachability *wifiReachability;
+
+@property (nonatomic, strong) NSString *updateAppUrl;
 
 
 @end

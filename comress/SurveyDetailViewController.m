@@ -23,29 +23,18 @@
     myDatabase = [Database sharedMyDbManager];
     survey = [[Survey alloc] init];
     
-    
-    __block int numOfQuestionsAnswered = 0;
-    __block CGFloat percentage = 0.0;
+    __block float averageRating = 0.0f;
     
     //get average rating of this survey
     [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
         FMResultSet *rs = [db executeQuery:@"select average_rating from su_survey where client_survey_id = ? or survey_id = ?",clientSurveyId,surveyId];
 
-        int averageRating = 0;
         while ([rs next]) {
-            averageRating = [rs intForColumn:@"average_rating"];
+            averageRating = [rs doubleForColumn:@"average_rating"];
         }
-        
-        //get the number of questions answered by this survey
-        FMResultSet *rsAnswered = [db executeQuery:@"select count(*) as count from su_answers where client_survey_id = ? or survey_id = ?",clientSurveyId,surveyId];
-        while ([rsAnswered next]) {
-            numOfQuestionsAnswered = [rsAnswered intForColumn:@"count"];
-        }
-        
-        percentage = ( (float)averageRating / (float)numOfQuestionsAnswered ) * 100.0f;
     }];
     
-    self.percentageRating.text = [NSString stringWithFormat:@"%.2f%%",percentage];
+    self.percentageRating.text = [NSString stringWithFormat:@"%.2f%%",averageRating];
 }
 
 - (void)viewWillAppear:(BOOL)animated

@@ -14,7 +14,7 @@
     BOOL didReorderListForNewIssue;
 }
 
-@property (nonatomic, strong) NSMutableArray *postsArray;
+@property (nonatomic, strong) NSArray *postsArray;
 @property (nonatomic, strong) NSArray *sectionHeaders;
 @property (nonatomic, strong) NSMutableArray *postsNotSeen;
 
@@ -48,7 +48,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadIssuesList) name:@"reloadIssuesList" object:nil];
     
     //notification for reloading issues when app recover from background to active;
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchPostFromRecovery) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchPostFromRecovery) name:UIApplicationDidBecomeActiveNotification object:nil];
     
     //turn on bulb icon for new unread posts
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(toggleBulbIcon:) name:@"toggleBulbIcon" object:nil];
@@ -73,7 +73,8 @@
 
 - (void)fetchPostFromRecovery
 {
-    [self fetchPostsWithNewIssuesUp:NO];
+    if(myDatabase.initializingComplete == 1)
+        [self fetchPostsWithNewIssuesUp:NO];
 }
 
 - (IBAction)moveNewIssuesUp:(id)sender
@@ -141,9 +142,10 @@
     [super viewDidAppear:animated];
     
     if(myDatabase.initializingComplete == 1)
+    {
         [self fetchPostsWithNewIssuesUp:NO];
-    
-    [self updateBadgeCount];
+        [self updateBadgeCount];
+    }
 }
 
 - (void)updateBadgeCount
@@ -240,6 +242,10 @@
 #pragma mark - fetch posts
 - (void)fetchPostsWithNewIssuesUp:(BOOL)newIssuesUp
 {
+    //we don't need to fetch anything while app is in background
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateBackground)
+        return;
+    
     if(myDatabase.initializingComplete == 0)
         return;
     
@@ -318,10 +324,12 @@
                 self.postsArray = [[NSMutableArray alloc] initWithArray:[post fetchIssuesWithParams:params forPostId:nil filterByBlock:YES newIssuesFirst:NO onlyOverDue:YES]];
         }
         
-        dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self.issuesTable reloadData];
         });
         
+
         //bulb icon toggle
         if(myDatabase.allPostWasSeen == NO)
         {

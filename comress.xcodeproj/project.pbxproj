@@ -57,6 +57,7 @@
 		4D26F4CB1AE730B800992319 /* MZAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D26F4C81AE730B800992319 /* MZAppearance.m */; };
 		4D26F4CC1AE730B800992319 /* NSInvocation+Copy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D26F4CA1AE730B800992319 /* NSInvocation+Copy.m */; };
 		4D26F4CF1AE731C600992319 /* MZCustomTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D26F4CE1AE731C600992319 /* MZCustomTransition.m */; };
+		4D26F4D11AE88CD600992319 /* comress.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4D26F4D01AE88CD600992319 /* comress.sqlite */; };
 		4D337D2F1ACBE10800F9C7AA /* rating@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D337D2E1ACBE10800F9C7AA /* rating@2x.png */; };
 		4D337D321ACBE8BC00F9C7AA /* radio_on@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D337D301ACBE8BC00F9C7AA /* radio_on@2x.png */; };
 		4D337D331ACBE8BC00F9C7AA /* radio_off@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D337D311ACBE8BC00F9C7AA /* radio_off@2x.png */; };
@@ -227,7 +228,6 @@
 		4DAEA6B41A834D7600A6EFBE /* NSDate+HumanizedTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAEA6B31A834D7600A6EFBE /* NSDate+HumanizedTime.m */; };
 		4DAEA6B71A83505E00A6EFBE /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DAEA6B51A83505E00A6EFBE /* Localizable.strings */; };
 		4DAEA6B81A83505E00A6EFBE /* Localizable_full.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4DAEA6B61A83505E00A6EFBE /* Localizable_full.strings */; };
-		4DCF495E1AE4EB22004AA95B /* comress.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4DCF495D1AE4EB22004AA95B /* comress.sqlite */; };
 		4DD6FE9E1A884CFF00CBBE1D /* MKAnnotationView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6FE7E1A884CFF00CBBE1D /* MKAnnotationView+WebCache.m */; };
 		4DD6FE9F1A884CFF00CBBE1D /* NSData+ImageContentType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6FE801A884CFF00CBBE1D /* NSData+ImageContentType.m */; };
 		4DD6FEA01A884CFF00CBBE1D /* SDImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6FE821A884CFF00CBBE1D /* SDImageCache.m */; };
@@ -368,6 +368,7 @@
 		4D26F4CA1AE730B800992319 /* NSInvocation+Copy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+Copy.m"; sourceTree = "<group>"; };
 		4D26F4CD1AE731C600992319 /* MZCustomTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MZCustomTransition.h; sourceTree = "<group>"; };
 		4D26F4CE1AE731C600992319 /* MZCustomTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MZCustomTransition.m; sourceTree = "<group>"; };
+		4D26F4D01AE88CD600992319 /* comress.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = comress.sqlite; sourceTree = "<group>"; };
 		4D337D2E1ACBE10800F9C7AA /* rating@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rating@2x.png"; sourceTree = "<group>"; };
 		4D337D301ACBE8BC00F9C7AA /* radio_on@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radio_on@2x.png"; sourceTree = "<group>"; };
 		4D337D311ACBE8BC00F9C7AA /* radio_off@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "radio_off@2x.png"; sourceTree = "<group>"; };
@@ -666,7 +667,6 @@
 		4DAEA6B31A834D7600A6EFBE /* NSDate+HumanizedTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+HumanizedTime.m"; sourceTree = "<group>"; };
 		4DAEA6B51A83505E00A6EFBE /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		4DAEA6B61A83505E00A6EFBE /* Localizable_full.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable_full.strings; sourceTree = "<group>"; };
-		4DCF495D1AE4EB22004AA95B /* comress.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = comress.sqlite; sourceTree = "<group>"; };
 		4DD6FE7D1A884CFF00CBBE1D /* MKAnnotationView+WebCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MKAnnotationView+WebCache.h"; sourceTree = "<group>"; };
 		4DD6FE7E1A884CFF00CBBE1D /* MKAnnotationView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKAnnotationView+WebCache.m"; sourceTree = "<group>"; };
 		4DD6FE7F1A884CFF00CBBE1D /* NSData+ImageContentType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+ImageContentType.h"; sourceTree = "<group>"; };
@@ -1340,7 +1340,7 @@
 		4DA204251A79CF8C00C7E5C7 /* db */ = {
 			isa = PBXGroup;
 			children = (
-				4DCF495D1AE4EB22004AA95B /* comress.sqlite */,
+				4D26F4D01AE88CD600992319 /* comress.sqlite */,
 			);
 			name = db;
 			sourceTree = "<group>";
@@ -1905,7 +1905,7 @@
 				4D6424CC1AD3CF3800B6B974 /* wiping@2x.png in Resources */,
 				4DAEA6B71A83505E00A6EFBE /* Localizable.strings in Resources */,
 				4D37BDB81A9C2271006B414A /* back.png in Resources */,
-				4DCF495E1AE4EB22004AA95B /* comress.sqlite in Resources */,
+				4D26F4D11AE88CD600992319 /* comress.sqlite in Resources */,
 				4D8AC9671AAD8CD4008F7652 /* routine@2x.png in Resources */,
 				4D337D5D1ACCDE1200F9C7AA /* aver_sel@2x.png in Resources */,
 				4D0AA01E1AC50B9200DC2886 /* textFieldBg@2x.png in Resources */,

@@ -8,6 +8,12 @@
 
 #import "AppDelegate.h"
 
+#if DEBUG
+    NSString *appName = @"ios_COMRESS_tptc_test";
+#else
+    NSString *appName = @"ios_COMRESS_tptc";
+#endif
+
 @interface AppDelegate ()
 
 @end
@@ -208,7 +214,48 @@
     [application endBackgroundTask:bgTask];
     bgTask = UIBackgroundTaskInvalid;
     
-    //[self downloadNewItems];
+    
+    
+    //version check
+    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    NSString *url = [NSString stringWithFormat:@"http://fmit.com.sg/comressmainservice/MobileDeviceInfo.svc/json/getDeviceVersion/?devicetype=%@&ver=%@",appName,appVersion];
+    
+    //call wcf
+    [myDatabase.AfManager GET:url parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        DDLogVerbose(@"responseObject %@",responseObject);
+        int versionNumber = [[responseObject objectForKey:@"result"] intValue];
+        
+        if(versionNumber == -1)
+        {
+            sync.stop = YES;
+            myDatabase.initializingComplete = 0;
+            myDatabase.userBlocksInitComplete = NO;
+            
+            self.updateAppUrl = [responseObject objectForKey:@"updateURL"];
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Update" message:@"A new version is available for update." delegate:self cancelButtonTitle:nil otherButtonTitles:@"Update!", nil];
+            alert.tag = 222;
+            
+            [alert show];
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        DDLogVerbose(@"auto update call failed: %@",error);
+    }];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(alertView.tag == 222) //auto update
+    {
+        NSString *stringURL = [NSString stringWithFormat:@"itms-services://?action=download-manifest&url=%@",self.updateAppUrl];
+        
+        DDLogVerbose(@"update url %@",self.updateAppUrl);
+        
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
+        
+        exit(1);
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

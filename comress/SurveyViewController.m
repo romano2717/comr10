@@ -424,12 +424,26 @@
             }
         }];
         
-        //int aver = sum / surveyQuestions.count;
-        int aver = sum / numberOfQuestionsAnswered;
+        
+        //((total rating / no of question that user answer) - 1)*50
+        //type cast
+        
+        float sumFloat = sum;
+        float numberOfQuestionsAnsweredFloat = numberOfQuestionsAnswered;
+        
+        float aver = ((sumFloat / numberOfQuestionsAnsweredFloat) - 1.0f) * 50.0f;
+        
+        NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+        [formatter setMaximumFractionDigits:2];
+        [formatter setMinimumFractionDigits:0];
+        NSString *result = [formatter stringFromNumber:[NSNumber numberWithFloat:aver]];
+        
+        float resultFloat = [result floatValue];
+                            
         
         //update the average rating of this survey
         [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
-            BOOL upAver = [db executeUpdate:@"update su_survey set average_rating = ? where client_survey_id = ?",[NSNumber numberWithInt:aver],[NSNumber numberWithLongLong:self.currentSurveyId]];
+            BOOL upAver = [db executeUpdate:@"update su_survey set average_rating = ? where client_survey_id = ?",result,[NSNumber numberWithLongLong:self.currentSurveyId]];
             
             if(!upAver)
             {

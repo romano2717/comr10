@@ -19,4 +19,6 @@
 @property (nonatomic, weak) IBOutlet UITextField *companyIdTextField;
 @property (nonatomic, weak) IBOutlet UITextField *userIdTextField;
 @property (nonatomic, weak) IBOutlet UITextField *passwordTextField;
+@property (nonatomic, weak) IBOutlet UILabel *versionLabel;
+@property (nonatomic, weak) IBOutlet UIScrollView *scrollView;
 @end

@@ -32,6 +32,8 @@
 
 - (void)kickStartSync
 {
+    return;
+    
     stop = NO;
     
     //outgoing
@@ -1698,7 +1700,7 @@
         NSArray *SurveyList = [dict objectForKey:@"SurveyList"];
         for (int i = 0; i < SurveyList.count; i++) {
             
-            NSNumber *AverageRating = [NSNumber numberWithInt:[[[SurveyList objectAtIndex:i] valueForKey:@"AverageRating"] intValue]];
+            NSNumber *AverageRating = [NSNumber numberWithInt:[[[SurveyList objectAtIndex:i] valueForKey:@"AverageRating"] floatValue]];
             NSNumber *ResidentAddressId = [NSNumber numberWithInt:[[[SurveyList objectAtIndex:i] valueForKey:@"AverageRating"] intValue]];
             NSString *ResidentAgeRange = [[SurveyList objectAtIndex:i] valueForKey:@"ResidentAgeRange"];
             NSString *ResidentGender = [[SurveyList objectAtIndex:i] valueForKey:@"ResidentGender"];
@@ -1897,7 +1899,7 @@
                 
                 post = nil;
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
+                [self reloadIssuesList];
             }
             
             if(downloadIsTriggeredBySelf)
@@ -2141,9 +2143,7 @@
         }
     }
     
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
-//    });
+    [self reloadIssuesList];
 }
 
 
@@ -2234,8 +2234,8 @@
                 [comment updateLastRequestDateWithDate:[dict valueForKey:@"LastRequestDate"]];
 
                 comment = nil;
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
+
+                [self reloadIssuesList];
             }
             if(downloadIsTriggeredBySelf)
             {
@@ -2321,9 +2321,7 @@
 
                 comment_noti = nil;
                 
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
-                });
+                [self reloadIssuesList];
             }
             if(downloadIsTriggeredBySelf)
             {
@@ -2388,5 +2386,12 @@
     localNotification.soundName = UILocalNotificationDefaultSoundName;
     localNotification.applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+}
+
+- (void)reloadIssuesList
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
+    });
 }
 @end

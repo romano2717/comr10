@@ -17,4 +17,5 @@
 }
 
 @property (nonatomic, weak) IBOutlet UITextField *activationCodeTextField;
+@property (nonatomic, weak) IBOutlet UILabel *versionLabel;
 @end

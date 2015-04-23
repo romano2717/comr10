@@ -19,6 +19,8 @@
     // Do any additional setup after loading the view.
     
     myDatabase = [Database sharedMyDbManager];
+    
+    self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
 }
 
 - (void)didReceiveMemoryWarning {

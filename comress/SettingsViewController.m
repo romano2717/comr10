@@ -21,6 +21,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    
     myDatabase = [Database sharedMyDbManager];
     
     users = [[Users alloc] init];
@@ -80,6 +82,14 @@
 
 - (void)logoutWithRelogin:(BOOL )relogin
 {
+    if([self checkIfSomethingWasNotSync] == NO)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Synchronise" message:@"Cannot sign out at this moment. Synchronise is not yet finished." delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Okay", nil];
+        [alert show];
+        
+        return;
+    }
+    
     [myDatabase.AfManager GET:[NSString stringWithFormat:@"%@%@%@",myDatabase.api_url,api_logout,[myDatabase.clientDictionary valueForKey:@"user_guid"] ] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         
         NSDictionary *dict = (NSDictionary *)responseObject;
@@ -88,11 +98,6 @@
             [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
                 db.traceExecution = YES;
                 
-//                NSArray *tableToDelete = @[@"ro_checkarea",@"ro_checkarea_last_req_date",@"ro_checklist",@"ro_checklist_last_req_date",@"ro_job",@"ro_job_last_req_date",@"ro_scanblock",@"ro_scanchecklist",@"ro_scanblock",@"ro_scanchecklist",@"ro_scanchecklist_blk",@"ro_scanchecklist_blk_last_req_date",@"ro_scanchecklist_last_req_date",@"ro_schedule",@"ro_schedule_last_req_date",@"ro_user_blk",@"ro_user_blk_last_req_date",@"ro_inspectionresult",@"su_address",@"su_answers",@"su_feedback",@"su_feedback_issue",@"su_questions",@"su_questions_last_req_date",@"su_survey",@"blocks_user",@"blocks_user_last_request_date",@"comment",@"comment_noti",@"post",@"post_image",@"comment_last_request_date",@"comment_noti_last_request_date",@"post_image_last_request_date",@"post_last_request_date",@"blocks",@"blocks_last_request_date",@"su_address",@"su_answers",@"su_feedback",@"su_feedback_issue",@"su_feedback_issues_last_req_date",@"su_questions",@"su_questions_last_req_date",@"su_survey",@"su_survey_last_req_date"];
-                
-                
-                //temp
-//                 NSArray *tableToDelete = @[@"su_survey",@"su_address",@"su_answers",@"su_feedback",@"su_feedback_issue",@"su_feedback_issues_last_req_date",@"su_questions",@"su_questions_last_req_date",@"su_survey",@"su_survey_last_req_date"];
                 //clear tables
                 NSArray *tableToDelete =
                 @[@"blocks_last_request_date",
@@ -174,6 +179,26 @@
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         DDLogVerbose(@"%@ [%@-%@]",error.localizedDescription,THIS_FILE,THIS_METHOD);
     }];
+}
+
+- (BOOL)checkIfSomethingWasNotSync
+{
+    __block BOOL everythingIsSync = YES;
+    
+    NSNumber *zero = [NSNumber numberWithInt:0];
+    
+    [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
+        
+        FMResultSet *rsPostCheck = [db executeQuery:@"select post_id from post where post_id = ?",zero];
+        if([rsPostCheck next] == YES)
+            everythingIsSync = NO;
+        
+        FMResultSet *rsSurveyCheck = [db executeQuery:@"select survey_id from su_survey where survey_id = ?",zero];
+        if([rsSurveyCheck next] == YES)
+            everythingIsSync = NO;
+    }];
+    
+    return everythingIsSync;
 }
 
 - (IBAction)reset:(id)sender

@@ -47,11 +47,7 @@
             
             self.dateLabel.text = [NSString stringWithFormat:@"%@",datestring];
             
-            int rating = [[survey valueForKey:@"average_rating"] intValue];
-            
-            CGFloat percentage = ( (float)rating / (float)answers.count ) * 100.0f;
-            
-            self.satisfactionRatingLabel.text = [NSString stringWithFormat:@"%.2f%% Satisfaction",percentage];
+            self.satisfactionRatingLabel.text = [NSString stringWithFormat:@"%.2f%% Satisfaction",[[survey valueForKey:@"average_rating"] floatValue]];
         }
         
         

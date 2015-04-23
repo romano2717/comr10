@@ -19,4 +19,5 @@
     Client *client;
 }
 @property (nonatomic, weak) IBOutlet UILabel *userFullNameLabel;
+@property (nonatomic, weak) IBOutlet UILabel *versionLabel;
 @end

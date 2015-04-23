@@ -33,8 +33,8 @@
         
         NSString *postTopic = [postDict valueForKey:@"post_topic"] ? [postDict valueForKey:@"post_topic"] : @"Untitled";
         
-        //post date
-        double timeStamp = [[postDict valueForKeyPath:@"post_date"] doubleValue];
+        //post date update on
+        double timeStamp = [[postDict valueForKeyPath:@"updated_on"] doubleValue];
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:timeStamp];
         NSString *dateStringForm = [date stringWithHumanizedTimeDifference:0 withFullString:NO];
         

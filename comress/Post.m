@@ -153,7 +153,7 @@ contract_type;
             {
                 if(filter == YES) //ME, don't display overdue
                 {
-                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date >= %f ",timestampDaysAgo] ]; //post_type = 1 is ISSUES
+                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date >= %f and status < %@",timestampDaysAgo, finishedStatus] ]; //post_type = 1 is ISSUES
                 }
                 
                 else // Others
