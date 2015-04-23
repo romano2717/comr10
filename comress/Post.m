@@ -153,19 +153,20 @@ contract_type;
             {
                 if(filter == YES) //ME, don't display overdue
                 {
-                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date >= %f and status < %@",timestampDaysAgo, finishedStatus] ]; //post_type = 1 is ISSUES
+                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date >= %f and status < %@ and block_id in (select block_id from blocks_user)",timestampDaysAgo, finishedStatus] ]; //post_type = 1 is ISSUES
                 }
                 
                 else // Others
                 {
-                    q = [[NSMutableString alloc] initWithString:@"select * from post where post_type = 1 " ]; //post_type = 1 is ISSUES
+                    //q = [[NSMutableString alloc] initWithString:@"select * from post where post_type = 1 " ]; //post_type = 1 is ISSUES
+                    q = [[NSMutableString alloc] initWithString:@"select * from post where post_type = 1 and block_id NOT IN (select block_id from blocks_user) "];
                 }
                 
             }
             
             else //OVERDUE TAB!
             {
-                q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date <= '%f' and status != %@ ",timestampDaysAgo, finishedStatus]]; //post_type = 1 is ISSUES
+                q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date <= '%f' and status != %@ and block_id in (select block_id from blocks_user) ",timestampDaysAgo, finishedStatus]]; //post_type = 1 is ISSUES
             }
         }
         
@@ -203,25 +204,6 @@ contract_type;
                 if([rsPost boolForColumn:@"seen"] == NO && onlyOverDue == YES) //if we found at leas one we flag it to no
                     myDatabase.allPostWasSeen = NO;
                 
-                /*
-                 add post info to our dict. this will be the top most level of our dictionary entry.
-                 but first check if this post under this block belongs to current user or others
-                 */
-                
-                if(filter == YES)
-                {
-                    FMResultSet *rsBlock = [db executeQuery:@"select block_id from blocks_user where block_id = ?",[rsPost stringForColumn:@"block_id"]];
-                    
-                    if([rsBlock next] == NO)
-                        continue;
-                }
-                else
-                {
-                    FMResultSet *rsBlock = [db executeQuery:@"select block_id from blocks_user where block_id = ?",[rsPost stringForColumn:@"block_id"]];
-                    
-                    if([rsBlock next] == YES)
-                        continue;
-                }
                 
                 [postChild setObject:[rsPost resultDictionary] forKey:@"post"];
                 
@@ -298,6 +280,7 @@ contract_type;
             
             while ([rs next]) {
                 NSNumber *postId = [NSNumber numberWithInt:[rs intForColumn:@"post_id"]];
+                
                 
                 for (int i = 0; i < arr.count; i++) {
                     NSDictionary *dict = (NSDictionary *)[arr objectAtIndex:i];

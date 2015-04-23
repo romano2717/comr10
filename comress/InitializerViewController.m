@@ -188,6 +188,7 @@
             else
             {
                 myDatabase.userBlocksInitComplete = 1;
+                
                 [self checkPostCount];
             }
             
@@ -421,7 +422,7 @@
             if(needToDownload)
                 [self startDownloadCommentNotiForPage:1 totalPage:0 requestDate:nil withUi:YES];
             else
-                [self initializingCompleteWithUi:YES];
+                [self checkQuestionsCount];
             
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             DDLogVerbose(@"%@ [%@-%@]",error.localizedDescription,THIS_FILE,THIS_METHOD);
@@ -495,7 +496,7 @@
             
             self.processLabel.text = @"Download complete";
             
-            [self initializingCompleteWithUi:YES];
+            [self checkQuestionsCount];
         }
         
         
@@ -794,6 +795,9 @@
     NSDictionary *params = @{@"currentPage":[NSNumber numberWithInt:page], @"lastRequestTime" : jsonDate};
     DDLogVerbose(@"params %@",[myDatabase toJsonString:params]);
     DDLogVerbose(@"session %@",[myDatabase.userDictionary valueForKey:@"guid"]);
+    DDLogVerbose(@"user %@",[myDatabase.userDictionary valueForKey:@"user_id"]);
+    DDLogVerbose(@"url %@",[NSString stringWithFormat:@"%@%@",myDatabase.api_url,api_download_posts]);
+    
     [myDatabase.AfManager POST:[NSString stringWithFormat:@"%@%@",myDatabase.api_url,api_download_posts] parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         
         NSDictionary *dict = [responseObject objectForKey:@"PostContainer"];
@@ -1009,7 +1013,7 @@
             
             myDatabase.userBlocksInitComplete = 1;
             
-            [self checkQuestionsCount];
+            [self checkPostCount];
         }
         
         
@@ -1072,14 +1076,15 @@
                 [self startDownloadQuestionsForPage:1 totalPage:0 requestDate:nil withUi:YES];
             else
             {
-                [self checkPostCount];
+                [self checkSurveyCount];
             }
             
             
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             DDLogVerbose(@"%@ [%@-%@]",error.localizedDescription,THIS_FILE,THIS_METHOD);
             
-            [self checkPostCount];
+            [self checkSurveyCount];
+
         }];
         
     }];

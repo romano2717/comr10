@@ -32,8 +32,6 @@
 
 - (void)kickStartSync
 {
-    return;
-    
     stop = NO;
     
     //outgoing

@@ -437,8 +437,6 @@
         [formatter setMaximumFractionDigits:2];
         [formatter setMinimumFractionDigits:0];
         NSString *result = [formatter stringFromNumber:[NSNumber numberWithFloat:aver]];
-        
-        float resultFloat = [result floatValue];
                             
         
         //update the average rating of this survey

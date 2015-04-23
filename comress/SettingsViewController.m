@@ -185,7 +185,8 @@
 {
     __block BOOL everythingIsSync = YES;
     
-    NSNumber *zero = [NSNumber numberWithInt:0];
+    NSNumber *zero = [NSNumber numberWithInt:0]; // haven't uploaded
+    NSNumber *one = [NSNumber numberWithInt:1]; //require to sync
     
     [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
         
@@ -193,7 +194,7 @@
         if([rsPostCheck next] == YES)
             everythingIsSync = NO;
         
-        FMResultSet *rsSurveyCheck = [db executeQuery:@"select survey_id from su_survey where survey_id = ?",zero];
+        FMResultSet *rsSurveyCheck = [db executeQuery:@"select survey_id from su_survey where survey_id = ?",one];
         if([rsSurveyCheck next] == YES)
             everythingIsSync = NO;
     }];

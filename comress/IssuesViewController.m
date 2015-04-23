@@ -135,11 +135,6 @@
     self.tabBarController.tabBar.hidden = NO;
     //self.navigationController.navigationBar.hidden = YES;
     self.hidesBottomBarWhenPushed = NO;
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
     
     if(myDatabase.initializingComplete == 1)
     {
@@ -148,11 +143,18 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [self.issuesTable reloadData];
+}
+
 - (void)updateBadgeCount
 {
     [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
         
-        FMResultSet *rs = [db executeQuery:@"select count(*) as count from comment_noti where status = ?",[NSNumber numberWithInt:1]];
+        FMResultSet *rs = [db executeQuery:@"select count(*) as count from comment_noti where status = ? and post_id in (select post_id from post)",[NSNumber numberWithInt:1]];
         if([rs next])
         {
             int badge = [rs intForColumn:@"count"];
