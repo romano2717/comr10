@@ -2110,6 +2110,9 @@
                         });
                     }
                 }];
+                
+                if(j >= ImageList.count - 1) //last object
+                    [self reloadIssuesList];
             } // for (int j = 0; j < ImageList.count; j++)
         } // for (int xx = 0; xx < imagesArr.count; xx++)
         if(imageDownloadComplete == YES) //0 ImageList
@@ -2141,7 +2144,7 @@
         }
     }
     
-    [self reloadIssuesList];
+    
 }
 
 
