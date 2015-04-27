@@ -12,12 +12,14 @@
 #import "Survey.h"
 #import "Blocks.h"
 
-@interface ResidentPopInfoViewController : UIViewController<MPGTextFieldDelegate>
+@interface ResidentPopInfoViewController : UIViewController<MPGTextFieldDelegate,UITextFieldDelegate>
 {
     Database *myDatabase;
     Survey *mySurvey;
     Blocks *blocks;
 }
+@property (nonatomic, weak) IBOutlet UIScrollView *scrollView;
+
 @property (nonatomic, strong) NSNumber *surveyId;
 @property (nonatomic, strong) NSNumber *clientSurveyId;
 
@@ -48,6 +50,7 @@
 
 @property (nonatomic, strong) NSMutableArray *addressArray;
 @property (nonatomic, strong) NSNumber *blockId;
+@property (nonatomic, strong) NSNumber *residentBlockId;
 
 
 @end

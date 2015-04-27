@@ -76,7 +76,6 @@
     [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
         FMResultSet *rsGetAdd = [db executeQuery:@"select * from su_address where client_address_id = ?",surveyAddressId];
         while ([rsGetAdd next]) {
-            DDLogVerbose(@"%@",[rsGetAdd resultDictionary]);
             defSurveyAddress = [rsGetAdd stringForColumn:@"address"];
             postalCode = [rsGetAdd stringForColumn:@"postal_code"];
         }

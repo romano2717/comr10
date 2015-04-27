@@ -446,13 +446,39 @@
 
 - (NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewRowAction *close = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Close" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-        
-        NSDictionary *dict = (NSDictionary *)[self.postsArray objectAtIndex:indexPath.row];
-        [self setPostStatusAtIndexPath:indexPath withStatus:[NSNumber numberWithInt:4] withPostDict:dict];
-        [self fetchPostsWithNewIssuesUp:NO];
-    }];
-    close.backgroundColor = [UIColor darkGrayColor];
+    NSDictionary *dict;
+    if(self.segment.selectedSegmentIndex == 0)
+        dict = (NSDictionary *)[self.postsArray objectAtIndex:indexPath.row];
+    else if(self.segment.selectedSegmentIndex == 1)
+        dict = (NSDictionary *)[[self.postsArray objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    else
+        dict = (NSDictionary *)[self.postsArray objectAtIndex:indexPath.row];
+    
+    NSDictionary *topDict = (NSDictionary *)[[dict allValues] firstObject];
+    NSDictionary *postDict = [topDict valueForKey:@"post"];
+    
+    int status = [[postDict valueForKey:@"status"] intValue] ? [[postDict valueForKey:@"status"] intValue] : 0;
+    
+    UITableViewRowAction *close;
+    
+    if(status == 4)//already closed, no need for action
+    {
+        close = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Close" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+            [self fetchPostsWithNewIssuesUp:NO];
+        }];
+        close.backgroundColor = [UIColor darkGrayColor];
+    }
+    else
+    {
+        close = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Close" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+            
+            NSDictionary *dict = (NSDictionary *)[self.postsArray objectAtIndex:indexPath.row];
+            [self setPostStatusAtIndexPath:indexPath withStatus:[NSNumber numberWithInt:4] withPostDict:dict];
+            [self fetchPostsWithNewIssuesUp:NO];
+        }];
+        close.backgroundColor = [UIColor darkGrayColor];
+    }
+    
     
     UITableViewRowAction *completed = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"Completed" handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         
@@ -481,8 +507,32 @@
     }];
     stop.backgroundColor = [UIColor redColor];
     
+    
+    //enable/disable status change
+    switch (status) {
+        case 1:
+            return  @[stop, completed];
+            break;
+            
+        case 2:
+            return  @[start];
+            break;
+            
+        case 3:
+            return  @[close];
+            break;
+            
+        case 4:
+            return @[close];
+            break;
+            
+        default:
+            return  @[start];
+            break;
+    }
+    
 
-    return  @[stop, start, completed, close];
+    return  @[start,stop, completed,close];
 }
 
 - (void)setPostStatusAtIndexPath:(NSIndexPath *)indexPath withStatus:(NSNumber *)clickedStatus withPostDict:(NSDictionary *)dict

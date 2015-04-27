@@ -153,7 +153,7 @@ contract_type;
             {
                 if(filter == YES) //ME, don't display overdue
                 {
-                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and post_date >= %f and status < %@ and block_id in (select block_id from blocks_user)",timestampDaysAgo, finishedStatus] ]; //post_type = 1 is ISSUES
+                    q = [[NSMutableString alloc] initWithString:[NSString stringWithFormat:@"select * from post where post_type = 1 and (post_date >= %f or status <= %@) and block_id in (select block_id from blocks_user)",timestampDaysAgo, finishedStatus] ]; //post_type = 1 is ISSUES
                 }
                 
                 else // Others
@@ -320,6 +320,8 @@ contract_type;
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"thereAreOVerDueIssues" object:nil userInfo:@{@"count":[NSNumber numberWithInt:overDueIssues]}];
         }
+        else
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"thereAreOVerDueIssues" object:nil userInfo:@{@"count":[NSNumber numberWithInt:0]}];
         
         if(mutArr.count == arr.count)
             return mutArr;

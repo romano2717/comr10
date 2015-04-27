@@ -142,7 +142,7 @@
             
             if([rs6 next])
             {
-                jsonDate = (NSDate *)[rs5 dateForColumn:@"date"];
+                jsonDate = (NSDate *)[rs6 dateForColumn:@"date"];
             }
             [self startDownloadFeedBackIssuesForPage:1 totalPage:0 requestDate:jsonDate];
             
@@ -1038,20 +1038,24 @@
             }
             
             //get the addresses base on resident address
-            FMResultSet *rsAddressSurvey2 = [db executeQuery:@"select * from su_address where client_address_id = ?",[NSNumber numberWithInt:ClientResidentAddressId]];
-            
-            while ([rsAddressSurvey2 next]) {
-                NSNumber *ClientAddressId = [NSNumber numberWithInt:[rsAddressSurvey2 intForColumn:@"client_address_id"]];
-                NSString *Location = [rsAddressSurvey2 stringForColumn:@"address"] ? [rsAddressSurvey2 stringForColumn:@"address"] : @"";
-                NSString *UnitNo = [rsAddressSurvey2 stringForColumn:@"unit_no"] ? [rsAddressSurvey2 stringForColumn:@"unit_no"] : @"";
-                NSString *SpecifyArea = [rsAddressSurvey2 stringForColumn:@"specify_area"] ? [rsAddressSurvey2 stringForColumn:@"specify_area"] : @"";
-                NSString *PostalCode = [rsAddressSurvey2 stringForColumn:@"postal_code"] ? [rsAddressSurvey2 stringForColumn:@"postal_code"] : @"0";
-                NSNumber *BlkId = [NSNumber numberWithInt:[rsAddressSurvey2 intForColumn:@"block_id"]];
+            if(ClientResidentAddressId > 0)
+            {
+                FMResultSet *rsAddressSurvey2 = [db executeQuery:@"select * from su_address where client_address_id = ?",[NSNumber numberWithInt:ClientResidentAddressId]];
                 
-                NSDictionary *dictAddSurvey = @{@"ClientAddressId":ClientAddressId,@"Location":Location,@"UnitNo":UnitNo,@"SpecifyArea":SpecifyArea,@"PostalCode":PostalCode,@"BlkId":BlkId};
-                
-                [addressArray addObject:dictAddSurvey];
+                while ([rsAddressSurvey2 next]) {
+                    NSNumber *ClientAddressId = [NSNumber numberWithInt:[rsAddressSurvey2 intForColumn:@"client_address_id"]];
+                    NSString *Location = [rsAddressSurvey2 stringForColumn:@"address"] ? [rsAddressSurvey2 stringForColumn:@"address"] : @"";
+                    NSString *UnitNo = [rsAddressSurvey2 stringForColumn:@"unit_no"] ? [rsAddressSurvey2 stringForColumn:@"unit_no"] : @"";
+                    NSString *SpecifyArea = [rsAddressSurvey2 stringForColumn:@"specify_area"] ? [rsAddressSurvey2 stringForColumn:@"specify_area"] : @"";
+                    NSString *PostalCode = [rsAddressSurvey2 stringForColumn:@"postal_code"] ? [rsAddressSurvey2 stringForColumn:@"postal_code"] : @"0";
+                    NSNumber *BlkId = [NSNumber numberWithInt:[rsAddressSurvey2 intForColumn:@"block_id"]];
+                    
+                    NSDictionary *dictAddSurvey = @{@"ClientAddressId":ClientAddressId,@"Location":Location,@"UnitNo":UnitNo,@"SpecifyArea":SpecifyArea,@"PostalCode":PostalCode,@"BlkId":BlkId};
+                    
+                    [addressArray addObject:dictAddSurvey];
+                }
             }
+            
             
             
             //get the addresses based on feedback
@@ -2105,9 +2109,12 @@
                     
                     if(CommentId > 0)//the image was in a form of a comment, so we need to reload our chat view to reflect the image
                     {
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                            [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadChatView" object:nil];
-                        });
+                        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+                        {
+                            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                                [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadChatView" object:nil];
+                            });
+                        }
                     }
                 }];
                 
@@ -2212,7 +2219,10 @@
             
             if(newCommentSaved == YES)
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadChatView" object:nil];
+                if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadChatView" object:nil];
+                }
             }
             //we move this inside valid insert
 //            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -2391,8 +2401,11 @@
 
 - (void)reloadIssuesList
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
-    });
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+    {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadIssuesList" object:nil];
+        });
+    }
 }
 @end

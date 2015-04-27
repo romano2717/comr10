@@ -353,7 +353,7 @@ static const int newDatabaseVersion = 2; //this database version is incremented 
                                                          error:&error];
     
     if (! jsonData) {
-        NSLog(@"Got an error: %@", error);
+        DDLogVerbose(@"Got an error: %@", error);
     } else {
        jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     }

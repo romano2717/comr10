@@ -97,7 +97,6 @@
 - (void)fetchSurvey
 {
     surveyArray = [survey fetchSurveyForSegment:(int)segment.selectedSegmentIndex];
-    DDLogVerbose(@"surveyArray %@",surveyArray);
     
     if(segment.selectedSegmentIndex == 2)//set overdue badge if there's any
     {

@@ -11,11 +11,14 @@
 
 @interface ResidentPopInfoViewController ()
 
+@property (nonatomic) BOOL okToSubmitForm;
+@property (nonatomic, strong) NSString *formErrorMsg;
+
 @end
 
 @implementation ResidentPopInfoViewController
 
-@synthesize surveyId,blockId,clientSurveyId;
+@synthesize surveyId,blockId,clientSurveyId,okToSubmitForm,formErrorMsg,residentBlockId;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -118,9 +121,10 @@
     self.otherContactTxtFld.text = otherContact;
     self.emailTxFld.text = email;
     
-    DDLogVerbose(@"%@",dict);
     
-    [self registerForKeyboardNotifications];
+    
+    //dismiss keyboard when dragged
+    self.scrollView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     
     [self generateData];
 }
@@ -144,7 +148,34 @@
     });
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetHeight(self.view.frame) * 1.5);
+}
+
+
 #pragma mark MPGTextField Delegate Methods
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    //move resident textfield up to give more space for auto suggest
+    if(textField.tag == 300)
+    {
+        CGRect residentTextFieldRect = textField.frame;
+        CGRect scrollViewFrame = self.scrollView.frame;
+        
+        [self.scrollView scrollRectToVisible:CGRectMake(scrollViewFrame.origin.x, residentTextFieldRect.origin.y - 10, scrollViewFrame.size.width, scrollViewFrame.size.height) animated:YES];
+        
+        self.client_resident_address_id = 0;
+        self.residentAddressPostalCode = @"-1";
+        residentBlockId = 0;
+        
+        textField.text = @"";
+        [textField becomeFirstResponder];
+    }
+}
 
 - (NSArray *)dataForPopoverInTextField:(MPGTextField *)textField
 {
@@ -159,12 +190,17 @@
 - (void)textField:(MPGTextField *)textField didEndEditingWithSelection:(NSDictionary *)result
 {
     if([[result valueForKey:@"CustomObject"] isKindOfClass:[NSDictionary class]] == NO) //user typed some shit!
+    {
+        self.client_resident_address_id = 0;
+        self.residentAddressPostalCode = @"-1";
+        residentBlockId = 0;
         return;
+    }
     
     self.surveyAddressTxtFld.text = [NSString stringWithFormat:@"%@ %@",[[result objectForKey:@"CustomObject"] valueForKey:@"block_no"],[[result objectForKey:@"CustomObject"] valueForKey:@"street_name"]];
     
-    blockId = [[result objectForKey:@"CustomObject"] valueForKey:@"block_id"];
-    self.surveyAddressPostalCode = [[result objectForKey:@"CustomObject"] valueForKey:@"postal_code"];
+    residentBlockId = [[result objectForKey:@"CustomObject"] valueForKey:@"block_id"];
+    self.residentAddressPostalCode = [[result objectForKey:@"CustomObject"] valueForKey:@"postal_code"];
     
 }
 
@@ -174,39 +210,24 @@
     // Dispose of any resources that can be recreated.
 }
 
-
-- (void)registerForKeyboardNotifications {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillShowNotification object:nil];
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    int MAXLENGTH = 8;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
-                                                 name:UIKeyboardWillHideNotification object:nil];
-}
-
-- (void)keyboardWillShow:(NSNotification*)aNotification {
-    NSDictionary* info = [aNotification userInfo];
-    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    if (textField.tag == 1000 || textField.tag == 2000) //contact
+    {
+        NSUInteger oldLength = [textField.text length];
+        NSUInteger replacementLength = [string length];
+        NSUInteger rangeLength = range.length;
+        
+        NSUInteger newLength = oldLength - rangeLength + replacementLength;
+        
+        BOOL returnKey = [string rangeOfString: @"\n"].location != NSNotFound;
+        
+        return newLength <= MAXLENGTH || returnKey;
+    }
     
-    CGRect aRect = self.view.frame;
-    aRect.size.height -= kbSize.height;
-    
-    [UIView animateWithDuration: 0.3 animations: ^{
-        self.view.frame = aRect;
-    }];
-}
-
-- (void)keyboardWillHide:(NSNotification*)aNotification {
-    NSDictionary* info = [aNotification userInfo];
-    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-    
-    CGRect aRect = self.view.frame;
-    aRect.size.height += kbSize.height;
-    
-    [UIView animateWithDuration: 0.3 animations: ^{
-        self.view.frame = aRect;
-    }];
+    return YES;
 }
 
 /*
@@ -226,14 +247,23 @@
 
 - (IBAction)save:(id)sender
 {
-    //change status of this survey as 1 to upload this survey
-//    [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
-//        BOOL requireSync = [db executeUpdate:@"update su_survey set status = ? where client_survey_id = ?",[NSNumber numberWithInt:1], surveyId];
-//        if (!requireSync) {
-//            *rollback = YES;
-//            return;
-//        }
-//    }];
+    NSString *theEmail = self.emailTxFld.text;
+    if([self NSStringIsValidEmail:theEmail] == NO)
+    {
+        okToSubmitForm = NO;
+        formErrorMsg = @"Invalid email address format.";
+    }
+    else
+        okToSubmitForm = YES;
+    
+    if(okToSubmitForm == NO)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Resident Information" message:formErrorMsg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Okay", nil];
+        
+        [alert show];
+        
+        return;
+    }
     
     [myDatabase.databaseQ inTransaction:^(FMDatabase *db, BOOL *rollback) {
         NSString *resident_name = self.residentNameTxtFld.text;
@@ -269,28 +299,32 @@
         
         
         
-        
-        if(self.client_resident_address_id == 0)
+        if(self.residentAddressTxtFld.text.length > 0 && self.residentAddressTxtFld.text != nil)
         {
-            BOOL insResidentAddress = [db executeUpdate:@"insert into su_address (address, unit_no, specify_area) values (?,?,?)",self.residentAddressTxtFld.text, self.unitNoTxtFld.text, self.areaTxtFld.text];
-            
-            if(!insResidentAddress)
+            if(self.client_resident_address_id == 0)
             {
-                *rollback = YES;
-                return;
+                BOOL insResidentAddress = [db executeUpdate:@"insert into su_address (address, unit_no, specify_area) values (?,?,?)",self.residentAddressTxtFld.text, self.unitNoTxtFld.text, self.areaTxtFld.text];
+                
+                if(!insResidentAddress)
+                {
+                    *rollback = YES;
+                    return;
+                }
+                self.client_survey_address_id = [db lastInsertRowId];
             }
-            self.client_survey_address_id = [db lastInsertRowId];
+            else
+            {
+                BOOL insResidentAddress = [db executeUpdate:@"update su_address set address = ?, unit_no = ?, specify_area = ? where client_address_id = ?",self.residentAddressTxtFld.text, self.unitNoTxtFld.text, self.areaTxtFld.text, [NSNumber numberWithLongLong:self.client_resident_address_id]];
+                
+                if(!insResidentAddress)
+                {
+                    *rollback = YES;
+                    return;
+                }
+            }
         }
         else
-        {
-            BOOL insResidentAddress = [db executeUpdate:@"update su_address set address = ?, unit_no = ?, specify_area = ? where client_address_id = ?",self.residentAddressTxtFld.text, self.unitNoTxtFld.text, self.areaTxtFld.text, [NSNumber numberWithLongLong:self.client_resident_address_id]];
-            
-            if(!insResidentAddress)
-            {
-                *rollback = YES;
-                return;
-            }
-        }
+            self.client_resident_address_id = 0;
         
         NSNumber *theSurveyId = [NSNumber numberWithInt:0];
         if(clientSurveyId > 0)
@@ -321,6 +355,16 @@
         Synchronize *sync = [Synchronize sharedManager];
         [sync uploadResidentInfoEditForSurveyId:theSurveyId];
     });
+}
+
+-(BOOL) NSStringIsValidEmail:(NSString *)checkString
+{
+    BOOL stricterFilter = NO; // Discussion http://blog.logichigh.com/2010/09/02/validating-an-e-mail-address/
+    NSString *stricterFilterString = @"[A-Z0-9a-z\\._%+-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4}";
+    NSString *laxString = @".+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2}[A-Za-z]*";
+    NSString *emailRegex = stricterFilter ? stricterFilterString : laxString;
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    return [emailTest evaluateWithObject:checkString];
 }
 
 @end

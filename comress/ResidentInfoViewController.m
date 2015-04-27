@@ -17,13 +17,16 @@
 
 @interface ResidentInfoViewController ()<MZFormSheetBackgroundWindowDelegate>
 {
-
+    
 }
+
+@property (nonatomic) BOOL okToSubmitForm;
+@property (nonatomic, strong) NSString *formErrorMsg;
 @end
 
 @implementation ResidentInfoViewController
 
-@synthesize surveyId,currentLocation,currentSurveyId,averageRating,placemark,didTakeActionOnDataPrivacyTerms,foundPlacesArray,blockId,residentBlockId,didAddFeedBack;
+@synthesize surveyId,currentLocation,currentSurveyId,averageRating,placemark,didTakeActionOnDataPrivacyTerms,foundPlacesArray,blockId,residentBlockId,didAddFeedBack,okToSubmitForm,formErrorMsg;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,6 +34,8 @@
     
     myDatabase = [Database sharedMyDbManager];
     blocks = [[Blocks alloc] init];
+    
+    okToSubmitForm = YES;
     
     self.ageRangeArray = [NSArray arrayWithObjects:@"Above 70",@"50 to 70",@"30 to 50",@"18 to 30",@"below 18", nil];
     self.raceArray = [NSArray arrayWithObjects:@"Chinese",@"Malay",@"Indian",@"Other", nil];
@@ -94,6 +99,36 @@
         textField.text = @"";
         [textField becomeFirstResponder];
     }
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    int MAXLENGTH = 8;
+    
+    if (textField.tag == 1000 || textField.tag == 2000) //contact
+    {
+        NSUInteger oldLength = [textField.text length];
+        NSUInteger replacementLength = [string length];
+        NSUInteger rangeLength = range.length;
+        
+        NSUInteger newLength = oldLength - rangeLength + replacementLength;
+        
+        BOOL returnKey = [string rangeOfString: @"\n"].location != NSNotFound;
+        
+        return newLength <= MAXLENGTH || returnKey;
+    }
+    
+    return YES;
+}
+
+-(BOOL) NSStringIsValidEmail:(NSString *)checkString
+{
+    BOOL stricterFilter = NO; // Discussion http://blog.logichigh.com/2010/09/02/validating-an-e-mail-address/
+    NSString *stricterFilterString = @"[A-Z0-9a-z\\._%+-]+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4}";
+    NSString *laxString = @".+@([A-Za-z0-9-]+\\.)+[A-Za-z]{2}[A-Za-z]*";
+    NSString *emailRegex = stricterFilter ? stricterFilterString : laxString;
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    return [emailTest evaluateWithObject:checkString];
 }
 
 - (NSArray *)dataForPopoverInTextField:(MPGTextField *)textField
@@ -225,6 +260,20 @@
     {
         [self action:self];
     }
+}
+
+- (void)willTransitionToTraitCollection:(UITraitCollection *)newCollection withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        
+        if(orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight)
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetHeight(self.view.frame) * 2);
+        else
+            self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetHeight(self.view.frame) * 1.5);
+    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -535,6 +584,23 @@
 
 - (void)saveResidentAdressWithSegueToFeedback:(BOOL)goToFeedback forBtnAction:(NSString *)action
 {
+    NSString *theEmail = self.emailTxFld.text;
+    if([self NSStringIsValidEmail:theEmail] == NO)
+    {
+        okToSubmitForm = NO;
+        formErrorMsg = @"Invalid email address format.";
+    }
+    else
+        okToSubmitForm = YES;
+    
+    if(okToSubmitForm == NO)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Resident Information" message:formErrorMsg delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Okay", nil];
+        
+        [alert show];
+        
+        return;
+    }
 
     didAddFeedBack = YES;
     

@@ -583,7 +583,7 @@
                 newMediaData = videoItemCopy;
             }
             else {
-                NSLog(@"%s error: unrecognized media item", __PRETTY_FUNCTION__);
+                DDLogVerbose(@"%s error: unrecognized media item", __PRETTY_FUNCTION__);
             }
             
             newMessage = [JSQMessage messageWithSenderId:user.user_id
@@ -639,7 +639,7 @@
                     [self.collectionView reloadData];
                 }
                 else {
-                    NSLog(@"%s error: unrecognized media item", __PRETTY_FUNCTION__);
+                    DDLogVerbose(@"%s error: unrecognized media item", __PRETTY_FUNCTION__);
                 }
                 
             });
@@ -874,17 +874,17 @@
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView
                 header:(JSQMessagesLoadEarlierHeaderView *)headerView didTapLoadEarlierMessagesButton:(UIButton *)sender
 {
-    NSLog(@"Load earlier messages!");
+    DDLogVerbose(@"Load earlier messages!");
 }
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"Tapped avatar!");
+    DDLogVerbose(@"Tapped avatar!");
 }
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"Tapped message bubble!");
+    DDLogVerbose(@"Tapped message bubble!");
     
     JSQMessage *message = [self.messageData.messages objectAtIndex:indexPath.row];
     
@@ -896,7 +896,7 @@
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapCellAtIndexPath:(NSIndexPath *)indexPath touchLocation:(CGPoint)touchLocation
 {
-    NSLog(@"Tapped cell at %@!", NSStringFromCGPoint(touchLocation));
+    DDLogVerbose(@"Tapped cell at %@!", NSStringFromCGPoint(touchLocation));
 }
 
 @end

@@ -16,8 +16,8 @@
 #import "DDTTYLogger.h"
 #import "DDASLLogger.h"
 
-
 static const int ddLogLevel = LOG_LEVEL_VERBOSE;
+//static const int ddLogLevel = LOG_LEVEL_OFF;
 
 static const int ping_interval = 600;
 

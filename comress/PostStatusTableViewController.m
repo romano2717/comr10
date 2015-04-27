@@ -133,18 +133,12 @@
             break;
         }
             
-        case 0: //pending
-        {
+        default: //pending
             if(indexPath.row == 1) //start
             {
                 cell.userInteractionEnabled = YES;
                 cell.backgroundColor = [UIColor whiteColor];
             }
-            
-            break;
-        }
-            
-        default:
             break;
     }
     
