@@ -197,7 +197,7 @@
         return;
     }
     
-    self.surveyAddressTxtFld.text = [NSString stringWithFormat:@"%@ %@",[[result objectForKey:@"CustomObject"] valueForKey:@"block_no"],[[result objectForKey:@"CustomObject"] valueForKey:@"street_name"]];
+    self.residentAddressTxtFld.text = [NSString stringWithFormat:@"%@ %@",[[result objectForKey:@"CustomObject"] valueForKey:@"block_no"],[[result objectForKey:@"CustomObject"] valueForKey:@"street_name"]];
     
     residentBlockId = [[result objectForKey:@"CustomObject"] valueForKey:@"block_id"];
     self.residentAddressPostalCode = [[result objectForKey:@"CustomObject"] valueForKey:@"postal_code"];
@@ -247,14 +247,17 @@
 
 - (IBAction)save:(id)sender
 {
-    NSString *theEmail = self.emailTxFld.text;
-    if([self NSStringIsValidEmail:theEmail] == NO)
+    NSString *theEmail = [self.emailTxFld.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if(theEmail.length > 0 && theEmail != nil)
     {
-        okToSubmitForm = NO;
-        formErrorMsg = @"Invalid email address format.";
+        if([self NSStringIsValidEmail:theEmail] == NO)
+        {
+            okToSubmitForm = NO;
+            formErrorMsg = @"Invalid email address format.";
+        }
+        else
+            okToSubmitForm = YES;
     }
-    else
-        okToSubmitForm = YES;
     
     if(okToSubmitForm == NO)
     {
